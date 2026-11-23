@@ -11,6 +11,11 @@ function cycleLeverage(): void {
   const i = levels.indexOf(store.leverage)
   store.leverage = levels[(i + 1) % levels.length]
 }
+
+function restart(): void {
+  store.reset()
+  store.start()
+}
 </script>
 
 <template>
@@ -41,7 +46,10 @@ function cycleLeverage(): void {
         自动做多 {{ store.autoBuy ? 'ON' : 'OFF' }}
       </button>
       <span class="speed-label">{{ 4 * store.speed }} 日/秒</span>
-      <button class="btn btn-ghost" @click="store.reset()">重开</button>
+      <button class="btn btn-ghost" :class="store.fxEnabled ? '' : 'fx-off'" @click="store.fxEnabled = !store.fxEnabled">
+        特效 {{ store.fxEnabled ? 'ON' : 'OFF' }}
+      </button>
+      <button class="btn btn-ghost" @click="restart">重开</button>
     </div>
   </header>
 </template>
@@ -85,6 +93,7 @@ function cycleLeverage(): void {
 .lev-btn { border-color: var(--gold); color: var(--gold); }
 .auto-on { background: linear-gradient(135deg, #ff5b5b, #d93b5b); color: #fff; border-color: transparent; box-shadow: 0 0 14px rgba(255, 91, 91, .55); }
 .speed-label { font-size: 10px; color: var(--muted); white-space: nowrap; padding: 0 3px; }
+.fx-off { color: var(--muted); border-color: transparent; }
 @media (max-width: 1300px) {
   .topbar { flex-wrap: wrap; }
   .stats { justify-content: flex-start; }

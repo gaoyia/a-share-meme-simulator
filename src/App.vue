@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useGameStore } from '@/stores/game'
 import TopBar from '@/components/TopBar.vue'
 import WatchList from '@/components/WatchList.vue'
@@ -25,6 +25,12 @@ onMounted(() => {
   showRules.value = !hadSave
   timer = window.setInterval(() => store.tick(), 200)
 })
+
+watch(
+  () => store.fxEnabled,
+  (on) => document.body.classList.toggle('no-fx', !on),
+  { immediate: true }
+)
 
 onBeforeUnmount(() => {
   if (timer) window.clearInterval(timer)
@@ -63,8 +69,8 @@ onBeforeUnmount(() => {
     </main>
     <TradeLog />
 
-    <FxOverlay />
-    <div class="fx-layer" aria-hidden="true">
+    <FxOverlay v-if="store.fxEnabled" />
+    <div v-if="store.fxEnabled" class="fx-layer" aria-hidden="true">
       <div class="watermark">模拟</div>
       <div class="scanline" />
     </div>

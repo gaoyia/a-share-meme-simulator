@@ -113,4 +113,5 @@ export interface GameSave {
   selectedCode?: string
   leverage?: number
   autoBuy?: boolean
+  fxEnabled?: boolean
 }

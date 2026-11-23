@@ -143,6 +143,7 @@ body::before {
   animation: gridMove 14s linear infinite;
 }
 @keyframes gridMove { to { background-position: 44px 44px; } }
+body.no-fx::before { animation: none; opacity: .3; }
 
 .price-flash { animation: priceFlash .65s ease; }
 @keyframes priceFlash {

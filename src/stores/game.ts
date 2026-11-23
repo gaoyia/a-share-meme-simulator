@@ -47,6 +47,7 @@ export const useGameStore = defineStore('game', () => {
   const selectedCode = ref('300059')
   const cooldowns = ref<Record<string, number>>({})
   const toasts = ref<Toast[]>([])
+  const fxEnabled = ref(true)
   const fxSignal = ref(0)
   const fxType = ref<'buy' | 'sell' | 'dividend' | 'limitup' | ''>('')
   const lastLimitFxDay = ref(0)
@@ -88,6 +89,7 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function fireFx(type: 'buy' | 'sell' | 'dividend' | 'limitup'): void {
+    if (!fxEnabled.value) return
     fxType.value = type
     fxSignal.value += 1
   }
@@ -109,7 +111,8 @@ export const useGameStore = defineStore('game', () => {
       secrets: 0,
       selectedCode: selectedCode.value,
       leverage: leverage.value,
-      autoBuy: autoBuy.value
+      autoBuy: autoBuy.value,
+      fxEnabled: fxEnabled.value
     }
     persist(SAVE_KEY, data)
   }
@@ -174,6 +177,7 @@ export const useGameStore = defineStore('game', () => {
     selectedCode.value = saved.selectedCode ?? '300059'
     leverage.value = saved.leverage ?? 1
     autoBuy.value = saved.autoBuy ?? false
+    fxEnabled.value = saved.fxEnabled ?? true
     const elapsed = Date.now() - (saved.lastTick ?? Date.now())
     if (elapsed > DAY_MS) {
       const missed = Math.min(5000, Math.floor(elapsed / DAY_MS))
@@ -548,7 +552,7 @@ export const useGameStore = defineStore('game', () => {
 
   return {
     day, cash, coins, positions, stocks, news, trades, history, index, trend, sentiment,
-    rivals, running, speed, gameOver, violation, selectedCode, leverage, autoBuy, cooldowns, toasts, fxSignal, fxType, lastTick,
+    rivals, running, speed, gameOver, violation, selectedCode, leverage, autoBuy, cooldowns, toasts, fxEnabled, fxSignal, fxType, lastTick,
     todayCard, lastCardDay, financeTarget,
     selectedStock, positionValue, totalAsset, totalReturn, positionCount, ranking, myRank, dividendProgress,
     init, reset, start, pause, setSpeed, tick, stepOnce, selectStock, buy, sell, sellPosition,
