@@ -1,10 +1,11 @@
 import type { Candle, Stock } from '@/types'
-import { clamp, dateFromDay, pick, rand, randn } from '@/utils/format'
+import { clamp, dateFromDay, rand, randn } from '@/utils/format'
 
 interface Seed {
   code: string
   name: string
   industry: string
+  concept: string
   price: number
   drift: number
   vol: number
@@ -17,14 +18,14 @@ interface Seed {
 }
 
 const SEEDS: Seed[] = [
-  { code: '600519', name: '贵州茅台', industry: '白酒', price: 1520, drift: 0.0022, vol: 0.026, beta: 0.7, revenue: 1500, cost: 700, otherIncome: 0, shares: 12.6, pe: 25 },
-  { code: '300750', name: '宁德时代', industry: '锂电池', price: 215, drift: 0.0032, vol: 0.048, beta: 1.3, revenue: 4000, cost: 3300, otherIncome: 50, shares: 44, pe: 13 },
-  { code: '002594', name: '比亚迪', industry: '汽车', price: 268, drift: 0.0028, vol: 0.040, beta: 1.1, revenue: 7000, cost: 6100, otherIncome: 80, shares: 29, pe: 8 },
-  { code: '600036', name: '招商银行', industry: '银行', price: 38, drift: 0.0018, vol: 0.022, beta: 0.6, revenue: 3400, cost: 1900, otherIncome: 0, shares: 252, pe: 6 },
-  { code: '688981', name: '中芯国际', industry: '半导体', price: 92, drift: 0.0040, vol: 0.058, beta: 1.5, revenue: 600, cost: 480, otherIncome: 20, shares: 80, pe: 52 },
-  { code: '300059', name: '东方财富', industry: '券商', price: 22, drift: 0.0035, vol: 0.055, beta: 1.6, revenue: 120, cost: 40, otherIncome: 5, shares: 158, pe: 40 },
-  { code: '000858', name: '五粮液', industry: '白酒', price: 138, drift: 0.0022, vol: 0.030, beta: 0.8, revenue: 900, cost: 300, otherIncome: 5, shares: 38.8, pe: 9 },
-  { code: '601318', name: '中国平安', industry: '保险', price: 55, drift: 0.0018, vol: 0.026, beta: 0.9, revenue: 9000, cost: 7600, otherIncome: 300, shares: 182, pe: 6 }
+  { code: '600519', name: '贵州茅台', industry: '白酒', concept: '消费复苏', price: 1520, drift: 0.0022, vol: 0.026, beta: 0.7, revenue: 1500, cost: 700, otherIncome: 0, shares: 12.6, pe: 25 },
+  { code: '300750', name: '宁德时代', industry: '锂电池', concept: '固态电池', price: 215, drift: 0.0032, vol: 0.048, beta: 1.3, revenue: 4000, cost: 3300, otherIncome: 50, shares: 44, pe: 13 },
+  { code: '002594', name: '比亚迪', industry: '汽车', concept: '无人驾驶', price: 268, drift: 0.0028, vol: 0.040, beta: 1.1, revenue: 7000, cost: 6100, otherIncome: 80, shares: 29, pe: 8 },
+  { code: '600036', name: '招商银行', industry: '银行', concept: '高股息', price: 38, drift: 0.0018, vol: 0.022, beta: 0.6, revenue: 3400, cost: 1900, otherIncome: 0, shares: 252, pe: 6 },
+  { code: '688981', name: '中芯国际', industry: '半导体', concept: '国产替代', price: 92, drift: 0.0040, vol: 0.058, beta: 1.5, revenue: 600, cost: 480, otherIncome: 20, shares: 80, pe: 52 },
+  { code: '300059', name: '东方财富', industry: '券商', concept: '牛市旗手', price: 22, drift: 0.0035, vol: 0.055, beta: 1.6, revenue: 120, cost: 40, otherIncome: 5, shares: 158, pe: 40 },
+  { code: '000858', name: '五粮液', industry: '白酒', concept: '品牌出海', price: 138, drift: 0.0022, vol: 0.030, beta: 0.8, revenue: 900, cost: 300, otherIncome: 5, shares: 38.8, pe: 9 },
+  { code: '601318', name: '中国平安', industry: '保险', concept: '养老金融', price: 55, drift: 0.0018, vol: 0.026, beta: 0.9, revenue: 9000, cost: 7600, otherIncome: 300, shares: 182, pe: 6 }
 ]
 
 export const DIVIDEND_TRIGGER = 2.2
@@ -34,26 +35,8 @@ export function defaultBasePrice(code: string): number {
   return SEEDS.find((s) => s.code === code)?.price ?? 100
 }
 
-const CONCEPTS = ['人工智能', '低空经济', '中特估', '华为产业链', '固态电池', '算力租赁', '新质生产力', '元宇宙', '无人驾驶']
-
-const CONCEPTS_BY_INDUSTRY: Record<string, string[]> = {
-  白酒: ['消费复苏', '中特估', '国企改革', '品牌出海'],
-  锂电池: ['固态电池', '储能', '新质生产力', '算力租赁'],
-  汽车: ['无人驾驶', '华为产业链', '以旧换新', '新质生产力'],
-  银行: ['中特估', '高股息', '数字经济', '金融科技'],
-  半导体: ['国产替代', 'AI算力', '华为产业链', '新质生产力'],
-  券商: ['中特估', '并购重组', '金融科技', '牛市旗手'],
-  保险: ['中特估', '高股息', '养老金融', '金融科技']
-}
-
-export function pickConcept(industry: string): string {
-  const pool = CONCEPTS_BY_INDUSTRY[industry] ?? CONCEPTS
-  return pick(pool)
-}
-
-export function isValidConcept(industry: string, concept: string): boolean {
-  const pool = CONCEPTS_BY_INDUSTRY[industry] ?? CONCEPTS
-  return pool.includes(concept)
+export function defaultConcept(code: string): string {
+  return SEEDS.find((s) => s.code === code)?.concept ?? '中特估'
 }
 
 function genHistory(seed: Seed): Candle[] {
@@ -93,7 +76,7 @@ export function createStocks(): Stock[] {
       code: seed.code,
       name: seed.name,
       industry: seed.industry,
-      concept: pickConcept(seed.industry),
+      concept: seed.concept,
       price: seed.price,
       prevClose: candles[candles.length - 2].close,
       anchor: seed.price,
@@ -189,4 +172,3 @@ export function applyDividend(stock: Stock, target: number): number {
   return factor
 }
 
-export { CONCEPTS }

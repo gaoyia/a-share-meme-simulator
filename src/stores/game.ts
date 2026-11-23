@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { ActionDef, GameSave, NewsItem, Position, Rival, Stock, Tone, Trade } from '@/types'
 import { ACTION_DEFS, MEME_CARDS, ambientNews, goodNewsText, makeNews, rumorText, squeezeNews, type MemeCard } from '@/engine/events'
-import { applyDividend, createStocks, defaultBasePrice, DIVIDEND_BASE_RATIO, DIVIDEND_TRIGGER, isValidConcept, pickConcept, stepMarket } from '@/engine/market'
+import { applyDividend, createStocks, defaultBasePrice, defaultConcept, DIVIDEND_BASE_RATIO, DIVIDEND_TRIGGER, stepMarket } from '@/engine/market'
 import { applyFinanceImpact, calcFinance } from '@/engine/finance'
 import { buyFee, clamp, loadSave, nowTime, persist, pick, rand, sellFee, uid } from '@/utils/format'
 
@@ -163,7 +163,7 @@ export const useGameStore = defineStore('game', () => {
     stocks.value.forEach((s) => {
       if (s.dividends === undefined) s.dividends = 0
       if (s.basePrice === undefined) s.basePrice = defaultBasePrice(s.code)
-      if (!isValidConcept(s.industry, s.concept)) s.concept = pickConcept(s.industry)
+      s.concept = defaultConcept(s.code)
     })
     positions.value.forEach((p) => {
       const s = stocks.value.find((x) => x.code === p.code)
@@ -486,8 +486,7 @@ export const useGameStore = defineStore('game', () => {
         const good = Math.random() < 0.55
         if (good) {
           s.eventBias += rand(0.05, 0.09)
-          s.concept = pickConcept(s.industry)
-          pushNews(makeNews(day.value, `${s.name}公告：拟收购优质资产，实现"蛇吞象"式跨界重组`, '并购重组（游戏虚构）', 'good', s.code))
+          pushNews(makeNews(day.value, `${s.name}公告：拟收购优质资产，强化${s.concept}主线`, '并购重组（游戏虚构）', 'good', s.code))
           notify('重组标的优质，市场给予溢价', 'good')
         } else {
           s.eventBias -= rand(0.035, 0.07)
@@ -509,10 +508,9 @@ export const useGameStore = defineStore('game', () => {
         notify('图形画好了，技术派正在进场', 'meme')
         break
       case 'hot':
-        s.concept = pickConcept(s.industry)
         s.eventBias += 0.045
-        pushNews(makeNews(day.value, `${s.name}：公司宣布切入${s.concept}赛道，已组建专项团队`, '蹭热点（游戏虚构）', 'meme', s.code))
-        notify(`已蹭上「${s.concept}」热点`, 'meme')
+        pushNews(makeNews(day.value, `${s.name}：公司宣布加码${s.concept}布局，机构称逻辑进一步强化`, '蹭热点（游戏虚构）', 'meme', s.code))
+        notify(`加码「${s.concept}」主线`, 'meme')
         break
       case 'team':
         s.eventBias += 0.035

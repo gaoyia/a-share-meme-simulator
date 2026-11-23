@@ -16,7 +16,7 @@ export const ACTION_DEFS: ActionDef[] = [
   { id: 'ma', name: '并购重组', icon: '并', desc: '蛇吞象还是商誉暴雷？抽盲盒决定命运。', cost: 1500, tone: 'meme', target: 'stock', cooldown: 4 },
   { id: 'finance', name: '修改财报', icon: '财', desc: '调营收、成本、股本，公式自动算利润和合理价。', cost: 600, tone: 'meme', target: 'stock', cooldown: 3 },
   { id: 'chart', name: '控盘做图形', icon: '线', desc: '花钱画金叉、突破、涨停板，技术派看了都说好。', cost: 1000, tone: 'meme', target: 'stock', cooldown: 3 },
-  { id: 'hot', name: '蹭热点概念', icon: '热', desc: '公司宣布切入当下最火赛道，股吧直呼"格局打开"。', cost: 500, tone: 'meme', target: 'stock', cooldown: 2 },
+  { id: 'hot', name: '蹭热点概念', icon: '热', desc: '公司宣布加码现有概念主线，股吧直呼"格局打开"。', cost: 500, tone: 'meme', target: 'stock', cooldown: 2 },
   { id: 'team', name: '拉萨天团接盘', icon: '散', desc: '散户大本营进场接盘，短期拉抬，但容易被监管盯上。', cost: 700, tone: 'meme', target: 'stock', cooldown: 3 },
   { id: 'squeeze', name: '逼空爆仓', icon: '空', desc: '传说有机构做空你持有的股票，结果被涨停逼到爆仓。', cost: 400, tone: 'meme', target: 'stock', cooldown: 4 }
 ]
@@ -108,7 +108,7 @@ export function squeezeNews(day: number, stock: Stock): NewsItem {
 export function goodNewsText(name: string, concept: string): string {
   const templates = [
     `${name}公告：与某头部企业签署 ${Math.round(rand(20, 90))} 亿元战略合作协议`,
-    `${name}：拟切入${concept}赛道，成立全资子公司`,
+    `${name}：拟加码${concept}布局，成立全资子公司`,
     `${name}新一代产品量产，良率超预期，订单已排到明年`,
     `${name}获国家级专项基金重点支持，行业地位进一步巩固`,
     `${name}宣布回购 ${Math.round(rand(5, 30))} 亿元股份，董事长称"被严重低估"`
