@@ -48,7 +48,12 @@ const CONCEPTS_BY_INDUSTRY: Record<string, string[]> = {
 
 export function pickConcept(industry: string): string {
   const pool = CONCEPTS_BY_INDUSTRY[industry] ?? CONCEPTS
-  return Math.random() < 0.85 ? pick(pool) : pick(CONCEPTS)
+  return pick(pool)
+}
+
+export function isValidConcept(industry: string, concept: string): boolean {
+  const pool = CONCEPTS_BY_INDUSTRY[industry] ?? CONCEPTS
+  return pool.includes(concept)
 }
 
 function genHistory(seed: Seed): Candle[] {

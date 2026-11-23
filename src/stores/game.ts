@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { ActionDef, GameSave, NewsItem, Position, Rival, Stock, Tone, Trade } from '@/types'
 import { ACTION_DEFS, MEME_CARDS, ambientNews, goodNewsText, makeNews, rumorText, squeezeNews, type MemeCard } from '@/engine/events'
-import { applyDividend, createStocks, defaultBasePrice, DIVIDEND_BASE_RATIO, DIVIDEND_TRIGGER, pickConcept, stepMarket } from '@/engine/market'
+import { applyDividend, createStocks, defaultBasePrice, DIVIDEND_BASE_RATIO, DIVIDEND_TRIGGER, isValidConcept, pickConcept, stepMarket } from '@/engine/market'
 import { applyFinanceImpact, calcFinance } from '@/engine/finance'
 import { buyFee, clamp, loadSave, nowTime, persist, pick, rand, sellFee, uid } from '@/utils/format'
 
@@ -163,7 +163,7 @@ export const useGameStore = defineStore('game', () => {
     stocks.value.forEach((s) => {
       if (s.dividends === undefined) s.dividends = 0
       if (s.basePrice === undefined) s.basePrice = defaultBasePrice(s.code)
-      if (s.concept === '减肥药') s.concept = pickConcept(s.industry)
+      if (!isValidConcept(s.industry, s.concept)) s.concept = pickConcept(s.industry)
     })
     positions.value.forEach((p) => {
       const s = stocks.value.find((x) => x.code === p.code)
