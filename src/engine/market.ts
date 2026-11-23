@@ -1,5 +1,5 @@
 import type { Candle, Stock } from '@/types'
-import { clamp, dateFromDay, rand, randn } from '@/utils/format'
+import { clamp, dateFromDay, pick, rand, randn } from '@/utils/format'
 
 interface Seed {
   code: string
@@ -34,7 +34,22 @@ export function defaultBasePrice(code: string): number {
   return SEEDS.find((s) => s.code === code)?.price ?? 100
 }
 
-const CONCEPTS = ['人工智能', '低空经济', '中特估', '华为产业链', '固态电池', '算力租赁', '新质生产力', '元宇宙', '减肥药', '无人驾驶']
+const CONCEPTS = ['人工智能', '低空经济', '中特估', '华为产业链', '固态电池', '算力租赁', '新质生产力', '元宇宙', '无人驾驶']
+
+const CONCEPTS_BY_INDUSTRY: Record<string, string[]> = {
+  白酒: ['消费复苏', '中特估', '国企改革', '品牌出海'],
+  锂电池: ['固态电池', '储能', '新质生产力', '算力租赁'],
+  汽车: ['无人驾驶', '华为产业链', '以旧换新', '新质生产力'],
+  银行: ['中特估', '高股息', '数字经济', '金融科技'],
+  半导体: ['国产替代', 'AI算力', '华为产业链', '新质生产力'],
+  券商: ['中特估', '并购重组', '金融科技', '牛市旗手'],
+  保险: ['中特估', '高股息', '养老金融', '金融科技']
+}
+
+export function pickConcept(industry: string): string {
+  const pool = CONCEPTS_BY_INDUSTRY[industry] ?? CONCEPTS
+  return Math.random() < 0.85 ? pick(pool) : pick(CONCEPTS)
+}
 
 function genHistory(seed: Seed): Candle[] {
   const days = 60
@@ -73,7 +88,7 @@ export function createStocks(): Stock[] {
       code: seed.code,
       name: seed.name,
       industry: seed.industry,
-      concept: CONCEPTS[Math.floor(Math.random() * CONCEPTS.length)],
+      concept: pickConcept(seed.industry),
       price: seed.price,
       prevClose: candles[candles.length - 2].close,
       anchor: seed.price,
